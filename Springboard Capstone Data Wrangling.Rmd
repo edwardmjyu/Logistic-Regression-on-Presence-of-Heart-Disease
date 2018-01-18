@@ -1,0 +1,103 @@
+---
+title: "Springboard Capstone Data Wrangling"
+author: "Edward Yu"
+date: "January 16, 2018"
+output:
+  html_document: 
+    toc: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = 'C:/R/Springboard_Project' )
+
+
+############
+###### Springboard Capstone Project: Data Wrangling
+
+###### Activate libraries
+library(farff)
+library(dplyr)
+library(ggplot2)
+
+###### Using farff to import datasets into data frames
+asd_child <- readARFF("Autism-Child-Data.arff")
+asd_adol <- readARFF("Autism-Adolescent-Data.arff")
+asd_adult <- readARFF("Autism-Adult-Data.arff")
+
+###### Viewing data options  
+tbl_df(asd_child)
+str(asd_child)
+str(asd_adol)
+str(asd_adult)
+View(asd_child)
+View(asd_adol)
+View(asd_adult)
+
+###### Renaming variables to more convenient names
+asd_child <-rename(asd_child, "class" = "Class/ASD", "country_res" = "contry_of_res", "jaundice" = "jundice", "family_autism" = "austim")
+asd_adol <-rename(asd_adol, "class" = "Class/ASD", "country_res" = "contry_of_res", "jaundice" = "jundice", "family_autism" = "austim")
+asd_adult <-rename(asd_adult, "class" = "Class/ASD", "country_res" = "contry_of_res", "jaundice" = "jundice", "family_autism" = "austim")
+
+###### Coercing variables: ethnicity, country_res, age_desc, and relation from factor -> char
+asd_child$ethnicity <- as.character(asd_child$ethnicity)
+asd_adol$ethnicity <- as.character(asd_adol$ethnicity)
+asd_adult$ethnicity <- as.character(asd_adult$ethnicity)
+
+asd_child$country_res <- as.character(asd_child$country_res)
+asd_adol$country_res <- as.character(asd_adol$country_res)
+asd_adult$country_res <- as.character(asd_adult$country_res)
+
+asd_child$age_desc <- as.character(asd_child$age_desc)
+asd_adol$age_desc <- as.character(asd_adol$age_desc)
+asd_adult$age_desc <- as.character(asd_adult$age_desc)
+
+asd_child$relation <- as.character(asd_child$relation)
+asd_adol$relation <- as.character(asd_adol$relation)
+asd_adult$relation <- as.character(asd_adult$relation)
+
+identical(sapply(asd_adult, class), sapply(asd_adol, class))
+
+###### Binding all datasets into master data set
+asd_master <-bind_rows(asd_child, asd_adol, asd_adult)
+
+###### View final cleaned master dataset
+View(asd_master)
+sapply(asd_master, class)
+tbl_df(asd_master)
+
+```
+
+
+## Data Wrangling Steps
+
+### Data Import 
+
+The primary source of data was initially provided in three separate data sets under the ARFF file type. The farff package was used to import the each data set into its own data frame. Each data set was stratified by an age grouping of the individual in which the questionnaire was concerned. The age groups were as follows: 
+
+
+Age Category | Age Range (years)
+-------------| -------------
+Child  | 4-11
+Adolescent | 12-16
+Adult | 18 +
+
+### Changing column names
+
+The resulting data frames were named asd_child, asd_adol, and asd_adult. Next, column headers were renamed to more appropriate convenient names to work with. Highlighting a few of these changes: 
+
+Original Column  | New Column 
+-------------| -------------
+Class/ASD | class
+contry_of_res | country_res
+jundice | jaundice
+austim | family_autism
+
+### Formatting uniform variables within all three data sets
+Character variables imported from ARFF files within variables such as ethnicity, country_res, age_desc, and relation were imported as factor variables. Because there is no function within readARFF function to set variables as characters, this was performed manually using the as.character function for each data set and each variable mentioned above. Once all three data sets contained the same number of variables and classes, the identical function was used in conjunction with sapply to test that all three data sets were equivalent in variable type. 
+
+### Row binding asd_child, asd_adol, asd_adult to one master data set
+After the three data sets were prepared, the function bind_rows was used to append each data set's observations together into a asd_master data set combining to a total 1100 observations with 21 variables in total. It should be mentioned that the data was already provided in tidy structure and is now finalized. 
+
+```{r echo=TRUE}
+sapply(asd_master, class)
+```
